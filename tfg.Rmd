@@ -1,0 +1,699 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+descarregar dades analisi de contingut
+```{r}
+install.packages("readxl")
+library(readxl)
+
+```
+
+```{r}
+df_content_2023<- read_excel("C:/Users/julia/Desktop/TFG/2023\\Variables_2023.xlsx")
+df_content_2022<- read_excel("C:/Users/julia/Desktop/TFG/2023\\Variables_2022.xlsx")
+df_content_2021<- read_excel("C:/Users/julia/Desktop/TFG/2023\\Variables_2021.xlsx")
+df_content_2020<- read_excel("C:/Users/julia/Desktop/TFG/2023\\Variables_2020.xlsx")
+df_content_2019<- read_excel("C:/Users/julia/Desktop/TFG/2023\\Variables_2019.xlsx")
+df_content_2018<-read_excel("C:/Users/julia/Desktop/TFG/2023\\Variables_2018.xlsx")
+df_content_2017<-read_excel("C:/Users/julia/Desktop/TFG/2023\\Variables_2017.xlsx")
+df_content_2016<-read_excel("C:/Users/julia/Desktop/TFG/2023\\Variables_2016.xlsx")
+df_content_2015<-read_excel("C:/Users/julia/Desktop/TFG/2023\\Variables_2015.xlsx")
+df_content_2014<-read_excel("C:/Users/julia/Desktop/TFG/2023\\Variables_2014.xlsx")
+df_content_2013<-read_excel("C:/Users/julia/Desktop/TFG/2023\\Variables_2013.xlsx")
+df_content_2012<-read_excel("C:/Users/julia/Desktop/TFG/2023\\Variables_2012.xlsx")
+df_content_2011<-read_excel("C:/Users/julia/Desktop/TFG/2023\\Variables_2011.xlsx")
+df_content_2010<-read_excel("C:/Users/julia/Desktop/TFG/2023\\Variables_2010.xlsx")
+df_content_2009<-read_excel("C:/Users/julia/Desktop/TFG/2023\\Variables_2009.xlsx")
+df_content_2008<-read_excel("C:/Users/julia/Desktop/TFG/2023\\Variables_2008.xlsx")
+df_content_2007<-read_excel("C:/Users/julia/Desktop/TFG/2023\\Variables_2007.xlsx")
+df_content_2006<-read_excel("C:/Users/julia/Desktop/TFG/2023\\Variables_2006.xlsx")
+df_content_2005<-read_excel("C:/Users/julia/Desktop/TFG/2023\\Variables_2005.xlsx")
+
+```
+ajuntar dades analisis de contingut + drop duplicates
+
+```{r}
+library(dplyr)
+
+
+
+# Merge 
+tots_anys <- bind_rows(df_content_2023,df_content_2022, df_content_2021, df_content_2020, df_content_2019, df_content_2018, df_content_2017, df_content_2016, df_content_2015, df_content_2014, df_content_2013, df_content_2012, df_content_2011, df_content_2010, df_content_2009, df_content_2008, df_content_2007,  df_content_2006, df_content_2005)
+
+library(tidyr)
+
+
+
+#  long format
+long_df <- pivot_longer(tots_anys, cols = c(Violencia, Familia_llar, salut_sexual, treball, fem_igualtat, represenatcio, treball_sex), names_to = "thematic", values_to = "value")
+
+# Print long format dataframe
+summarized_df <- long_df %>%
+  group_by(thematic, `Grupo de documentos` ) %>%
+  summarize(total_value = sum(value))
+
+# Print  summarized dataframe
+print(summarized_df)
+
+```
+descarregar taula politics + ajuntar + drop duplicates
+
+
+
+
+
+
+
+
+
+
+grafic tematiques anys
+```{r}
+library(ggplot2)
+
+ggplot(summarized_df, aes(x= `Grupo de documentos` , y= total_value, fill=thematic)) + 
+    geom_area()+
+scale_x_continuous(breaks = seq(min(Party_counts$Year), max(Party_counts$Year), 1)) +
+  scale_fill_manual(
+    name = "Temàtiques", 
+    values = c("Familia_llar" = "#F8766D", "fem_igualtat" = "#CD9600", "represenatcio"="#7CAE00", "salut_sexual"="#00C19A", "treball"="#00A9FF", "treball_sex"="#C77CFF", "Violencia"="#FF61CC"), 
+    labels = c("Familia_llar" = "Familia/infants/llar", "fem_igualtat" = "Feminisme/igualtat", "represenatcio"="Representació", "salut_sexual"="Salut sexual", "treball"="Treball", "treball_sex"="Treball sexual", "Violencia"="Violència"))+
+  labs(
+       x = "",
+       y = ""
+       ) +
+  
+  theme(axis.text.x = element_text(angle = 75, vjust = 0.5, hjust=1))
+
+```
+
+```{r}
+
+total_values <- aggregate(total_value ~ `Grupo de documentos`, summarized_df, sum)
+ggplot(total_values, aes(x = `Grupo de documentos`, y = total_value)) +
+  geom_line(color = "#F8766D", size = 1.5) +  # Pink line with increased thickness
+  geom_point(color = "#F8766D", size = 3, shape = 19) +  # Pink points with larger size and solid shape
+  scale_x_continuous(breaks = seq(min(Party_counts$Year), max(Party_counts$Year), 1)) +
+  labs(x = "", y = "Frequència", title = "") +
+  theme_minimal() + 
+  theme(axis.text.x = element_text(angle = 75, vjust = 0.5, hjust=1))# Minimal theme
+  theme(  # Additional theme customization
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),  # Larger, bold title
+    axis.text = element_text(size = 12),  # Larger axis text
+    axis.title = element_text(size = 14, face = "bold"),  # Larger, bold axis titles
+    legend.position = "none"  # Remove legend
+  )
+    
+ 
+
+
+```
+
+2023
+
+```{r}
+
+
+df_treball_2023<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_2023.xlsx")
+df_treball_sex_2023<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_sexual_2023.xlsx")
+
+df_representacio_2023<- read_excel("C:/Users/julia/Desktop/TFG/2023\\representacio_2023.xlsx")
+df_violencia_2023<- read_excel("C:/Users/julia/Desktop/TFG/2023\\violencia_2023.xlsx")
+df_igualtat_2023<- read_excel("C:/Users/julia/Desktop/TFG/2023\\igualtat_2023.xlsx")
+df_familia_2023<- read_excel("C:/Users/julia/Desktop/TFG/2023\\familia_llar_2023.xlsx")
+df_salut_2023<- read_excel("C:/Users/julia/Desktop/TFG/2023\\salut_sexual_2023.xlsx")
+
+cat_2023 <- bind_rows(df_salut_2023, df_igualtat_2023, df_treball_2023, df_treball_sex_2023, df_familia_2023, df_representacio_2023, df_violencia_2023)
+
+```
+
+
+2022
+
+```{r}
+
+
+df_treball_2022<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_2022.xlsx")
+df_treball_sex_2022<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_sexual_2022.xlsx")
+
+df_representacio_2022<- read_excel("C:/Users/julia/Desktop/TFG/2023\\representacio_2022.xlsx")
+df_violencia_2022<- read_excel("C:/Users/julia/Desktop/TFG/2023\\violencia_2022.xlsx")
+df_igualtat_2022<- read_excel("C:/Users/julia/Desktop/TFG/2023\\igualtat_2022.xlsx")
+df_familia_2022<- read_excel("C:/Users/julia/Desktop/TFG/2023\\familia_llar_2022.xlsx")
+df_salut_2022<- read_excel("C:/Users/julia/Desktop/TFG/2023\\salut_sexual_2022.xlsx")
+
+cat_2022 <- bind_rows(df_salut_2022, df_igualtat_2022, df_treball_2022, df_treball_sex_2022, df_familia_2022, df_representacio_2022, df_violencia_2022)
+
+```
+
+
+
+2021
+```{r}
+
+
+df_treball_2021<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_2021.xlsx")
+df_treball_sex_2021<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_sexual_2021.xlsx")
+
+df_representacio_2021<- read_excel("C:/Users/julia/Desktop/TFG/2023\\representacio_2021.xlsx")
+df_violencia_2021<- read_excel("C:/Users/julia/Desktop/TFG/2023\\violencia_2021.xlsx")
+df_igualtat_2021<- read_excel("C:/Users/julia/Desktop/TFG/2023\\igualtat_2021.xlsx")
+df_familia_2021<- read_excel("C:/Users/julia/Desktop/TFG/2023\\familia_llar_2021.xlsx")
+df_salut_2021<- read_excel("C:/Users/julia/Desktop/TFG/2023\\salut_sexual_2021.xlsx")
+
+cat_2021 <- bind_rows(df_salut_2021, df_igualtat_2021, df_treball_2021, df_treball_sex_2021, df_familia_2021, df_representacio_2021, df_violencia_2021)
+
+```
+
+
+2020
+```{r}
+
+
+df_treball_2020<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_2020.xlsx")
+df_treball_sex_2020<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_sexual_2020.xlsx")
+
+df_representacio_2020<- read_excel("C:/Users/julia/Desktop/TFG/2023\\representacio_2020.xlsx")
+df_violencia_2020<- read_excel("C:/Users/julia/Desktop/TFG/2023\\Violencia_2020.xlsx")
+df_igualtat_2020<- read_excel("C:/Users/julia/Desktop/TFG/2023\\igualtat_2020.xlsx")
+df_familia_2020<- read_excel("C:/Users/julia/Desktop/TFG/2023\\familia_llar_2020.xlsx")
+df_salut_2020<- read_excel("C:/Users/julia/Desktop/TFG/2023\\Salut_sexual_2020.xlsx")
+
+cat_2020 <- bind_rows(df_salut_2020, df_igualtat_2020, df_treball_2020, df_treball_sex_2020, df_familia_2020, df_representacio_2020, df_violencia_2020)
+
+```
+
+
+2019
+```{r}
+
+
+df_treball_2019<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_2019.xlsx")
+df_treball_sex_2019<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_sexual_2019.xlsx")
+
+df_representacio_2019<- read_excel("C:/Users/julia/Desktop/TFG/2023\\representacio_2019.xlsx")
+df_violencia_2019<- read_excel("C:/Users/julia/Desktop/TFG/2023\\violencia_2019.xlsx")
+df_igualtat_2019<- read_excel("C:/Users/julia/Desktop/TFG/2023\\igualtat_2019.xlsx")
+df_familia_2019<- read_excel("C:/Users/julia/Desktop/TFG/2023\\familia_llar_2019.xlsx")
+df_salut_2019<- read_excel("C:/Users/julia/Desktop/TFG/2023\\salut_sexual_2019.xlsx")
+
+cat_2019 <- bind_rows(df_salut_2019, df_igualtat_2019, df_treball_2019, df_treball_sex_2019, df_familia_2019, df_representacio_2019, df_violencia_2019)
+
+```
+
+
+2018
+```{r}
+
+
+df_treball_2018<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_2018.xlsx")
+df_treball_sex_2018<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_sexual_2018.xlsx")
+
+df_representacio_2018<- read_excel("C:/Users/julia/Desktop/TFG/2023\\representacio_2018.xlsx")
+df_violencia_2018<- read_excel("C:/Users/julia/Desktop/TFG/2023\\violencia_2018.xlsx")
+df_igualtat_2018<- read_excel("C:/Users/julia/Desktop/TFG/2023\\igualtat_2018.xlsx")
+df_familia_2018<- read_excel("C:/Users/julia/Desktop/TFG/2023\\familia_llar_2018.xlsx")
+df_salut_2018<- read_excel("C:/Users/julia/Desktop/TFG/2023\\salut_sexual_2018.xlsx")
+
+cat_2018 <- bind_rows(df_salut_2018, df_igualtat_2018, df_treball_2018, df_treball_sex_2018, df_familia_2018, df_representacio_2018, df_violencia_2018)
+
+```
+
+
+2017
+```{r}
+
+
+df_treball_2017<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_2017.xlsx")
+df_treball_sex_2017<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_sexual_2017.xlsx")
+
+df_representacio_2017<- read_excel("C:/Users/julia/Desktop/TFG/2023\\representacio_2017.xlsx")
+df_violencia_2017<- read_excel("C:/Users/julia/Desktop/TFG/2023\\violencia_2017.xlsx")
+df_igualtat_2017<- read_excel("C:/Users/julia/Desktop/TFG/2023\\igualtat_2017.xlsx")
+df_familia_2017<- read_excel("C:/Users/julia/Desktop/TFG/2023\\familia_llar_2017.xlsx")
+df_salut_2017<- read_excel("C:/Users/julia/Desktop/TFG/2023\\salut_sexual_2017.xlsx")
+
+cat_2017 <- bind_rows(df_salut_2017, df_igualtat_2017, df_treball_2017, df_treball_sex_2017, df_familia_2017, df_representacio_2017, df_violencia_2017)
+
+```
+
+
+2016
+```{r}
+
+
+df_treball_2016<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_2016.xlsx")
+df_treball_sex_2016<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_sexual_2016.xlsx")
+
+df_representacio_2016<- read_excel("C:/Users/julia/Desktop/TFG/2023\\representacio_2016.xlsx")
+df_violencia_2016<- read_excel("C:/Users/julia/Desktop/TFG/2023\\violencia_2016.xlsx")
+df_igualtat_2016<- read_excel("C:/Users/julia/Desktop/TFG/2023\\igualtat_2016.xlsx")
+df_familia_2016<- read_excel("C:/Users/julia/Desktop/TFG/2023\\familia_llar_2016.xlsx")
+df_salut_2016<- read_excel("C:/Users/julia/Desktop/TFG/2023\\salut_sexual_2016.xlsx")
+
+cat_2016 <- bind_rows(df_salut_2016, df_igualtat_2016, df_treball_2016, df_treball_sex_2016, df_familia_2016, df_representacio_2016, df_violencia_2016)
+
+```
+
+
+2015
+```{r}
+
+
+df_treball_2015<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_2015.xlsx")
+df_treball_sex_2015<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_sexual_2015.xlsx")
+
+df_representacio_2015<- read_excel("C:/Users/julia/Desktop/TFG/2023\\representacio_2015.xlsx")
+df_violencia_2015<- read_excel("C:/Users/julia/Desktop/TFG/2023\\violencia_2015.xlsx")
+df_igualtat_2015<- read_excel("C:/Users/julia/Desktop/TFG/2023\\igualtat_2015.xlsx")
+df_familia_2015<- read_excel("C:/Users/julia/Desktop/TFG/2023\\familia_llar_2015.xlsx")
+df_salut_2015<- read_excel("C:/Users/julia/Desktop/TFG/2023\\salut_sexual_2015.xlsx")
+
+cat_2015 <- bind_rows(df_salut_2015, df_igualtat_2015, df_treball_2015, df_treball_sex_2015, df_familia_2015, df_representacio_2015, df_violencia_2015)
+
+```
+
+2014
+
+```{r}
+
+
+df_treball_2014<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_2014.xlsx")
+df_treball_sex_2014<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_sexual_2014.xlsx")
+
+df_representacio_2014<- read_excel("C:/Users/julia/Desktop/TFG/2023\\representacio_2014.xlsx")
+df_violencia_2014<- read_excel("C:/Users/julia/Desktop/TFG/2023\\violencia_2014.xlsx")
+df_igualtat_2014<- read_excel("C:/Users/julia/Desktop/TFG/2023\\igualtat_2014.xlsx")
+df_familia_2014<- read_excel("C:/Users/julia/Desktop/TFG/2023\\familia_llar_2014.xlsx")
+df_salut_2014<- read_excel("C:/Users/julia/Desktop/TFG/2023\\salut_sexual_2014.xlsx")
+
+cat_2014 <- bind_rows(df_salut_2014, df_igualtat_2014, df_treball_2014, df_treball_sex_2014, df_familia_2014, df_representacio_2014, df_violencia_2014)
+
+```
+
+
+
+2013
+```{r}
+
+
+df_treball_2013<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_2013.xlsx")
+df_treball_sex_2013<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_sexual_2013.xlsx")
+
+df_representacio_2013<- read_excel("C:/Users/julia/Desktop/TFG/2023\\representacio_2013.xlsx")
+df_violencia_2013<- read_excel("C:/Users/julia/Desktop/TFG/2023\\violencia_2013.xlsx")
+df_igualtat_2013<- read_excel("C:/Users/julia/Desktop/TFG/2023\\igualtat_2013.xlsx")
+df_familia_2013<- read_excel("C:/Users/julia/Desktop/TFG/2023\\familia_llar_2013.xlsx")
+df_salut_2013<- read_excel("C:/Users/julia/Desktop/TFG/2023\\salut_sexual_2013.xlsx")
+
+cat_2013 <- bind_rows(df_salut_2013, df_igualtat_2013, df_treball_2013, df_treball_sex_2013, df_familia_2013, df_representacio_2013, df_violencia_2013)
+
+```
+
+2012
+```{r}
+
+
+df_treball_2012<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_2012.xlsx")
+df_treball_sex_2012<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_sexual_2012.xlsx")
+
+
+df_violencia_2012<- read_excel("C:/Users/julia/Desktop/TFG/2023\\violencia_2012.xlsx")
+df_igualtat_2012<- read_excel("C:/Users/julia/Desktop/TFG/2023\\igualtat_2012.xlsx")
+df_familia_2012<- read_excel("C:/Users/julia/Desktop/TFG/2023\\familia_llar_2012.xlsx")
+df_salut_2012<- read_excel("C:/Users/julia/Desktop/TFG/2023\\salut_sexual_2012.xlsx")
+
+cat_2012 <- bind_rows(df_salut_2012, df_igualtat_2012, df_treball_2012, df_treball_sex_2012, df_familia_2012,  df_violencia_2012)
+
+```
+
+
+2011
+```{r}
+
+
+df_treball_2011<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_2011.xlsx")
+df_treball_sex_2011<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_sexual_2011.xlsx")
+
+df_representacio_2011<- read_excel("C:/Users/julia/Desktop/TFG/2023\\representacio_2011.xlsx")
+df_violencia_2011<- read_excel("C:/Users/julia/Desktop/TFG/2023\\violencia_2011.xlsx")
+df_igualtat_2011<- read_excel("C:/Users/julia/Desktop/TFG/2023\\igualtat_2011.xlsx")
+df_familia_2011<- read_excel("C:/Users/julia/Desktop/TFG/2023\\familia_llar_2011.xlsx")
+df_salut_2011<- read_excel("C:/Users/julia/Desktop/TFG/2023\\salut_sexual_2011.xlsx")
+
+cat_2011 <- bind_rows(df_salut_2011, df_igualtat_2011, df_treball_2011, df_treball_sex_2011, df_familia_2011, df_representacio_2011, df_violencia_2011)
+
+```
+
+
+2010
+```{r}
+
+
+df_treball_2010<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_2010.xlsx")
+df_treball_sex_2010<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_sexual_2010.xlsx")
+
+
+df_violencia_2010<- read_excel("C:/Users/julia/Desktop/TFG/2023\\violencia_2010.xlsx")
+df_igualtat_2010<- read_excel("C:/Users/julia/Desktop/TFG/2023\\igualtat_2010.xlsx")
+df_familia_2010<- read_excel("C:/Users/julia/Desktop/TFG/2023\\familia_llar_2010.xlsx")
+df_salut_2010<- read_excel("C:/Users/julia/Desktop/TFG/2023\\salut_sexual_2010.xlsx")
+
+cat_2010 <- bind_rows(df_salut_2010, df_igualtat_2010, df_treball_2010, df_treball_sex_2010, df_familia_2010,  df_violencia_2010)
+
+```
+
+2009
+```{r}
+
+
+
+df_treball_sex_2009<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_sexual_2009.xlsx")
+
+df_representacio_2009<- read_excel("C:/Users/julia/Desktop/TFG/2023\\representacio_2009.xlsx")
+df_violencia_2009<- read_excel("C:/Users/julia/Desktop/TFG/2023\\violencia_2009.xlsx")
+df_igualtat_2009<- read_excel("C:/Users/julia/Desktop/TFG/2023\\igualtat_2009.xlsx")
+df_familia_2009<- read_excel("C:/Users/julia/Desktop/TFG/2023\\familia_llar_2009.xlsx")
+df_salut_2009<- read_excel("C:/Users/julia/Desktop/TFG/2023\\salut_sexual_2009.xlsx")
+
+cat_2009 <- bind_rows(df_salut_2009, df_igualtat_2009,  df_treball_sex_2009, df_familia_2009, df_representacio_2009, df_violencia_2009)
+
+```
+
+
+2008
+```{r}
+
+
+df_treball_2008<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_2008.xlsx")
+df_treball_sex_2008<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_sexual_2008.xlsx")
+
+
+df_violencia_2008<- read_excel("C:/Users/julia/Desktop/TFG/2023\\violencia_2008.xlsx")
+df_igualtat_2008<- read_excel("C:/Users/julia/Desktop/TFG/2023\\igualtat_2008.xlsx")
+df_familia_2008<- read_excel("C:/Users/julia/Desktop/TFG/2023\\familia_llar_2008.xlsx")
+df_salut_2008<- read_excel("C:/Users/julia/Desktop/TFG/2023\\salut_sexual_2008.xlsx")
+
+cat_2008 <- bind_rows(df_salut_2008, df_igualtat_2008, df_treball_2008, df_treball_sex_2008, df_familia_2008,  df_violencia_2008)
+
+```
+
+2007
+```{r}
+
+
+
+df_treball_sex_2007<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_sexual_2007.xlsx")
+
+df_representacio_2007<- read_excel("C:/Users/julia/Desktop/TFG/2023\\representacio_2007.xlsx")
+df_violencia_2007<- read_excel("C:/Users/julia/Desktop/TFG/2023\\violencia_2007.xlsx")
+df_igualtat_2007<- read_excel("C:/Users/julia/Desktop/TFG/2023\\igualtat_2007.xlsx")
+df_familia_2007<- read_excel("C:/Users/julia/Desktop/TFG/2023\\familia_llar_2007.xlsx")
+df_salut_2007<- read_excel("C:/Users/julia/Desktop/TFG/2023\\salut_sexual_2007.xlsx")
+
+cat_2007 <- bind_rows(df_salut_2007, df_igualtat_2007, df_treball_sex_2007, df_familia_2007, df_representacio_2007, df_violencia_2007)
+
+```
+
+2006
+```{r}
+
+
+df_treball_2006<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_2006.xlsx")
+df_treball_sex_2006<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_sexual_2006.xlsx")
+
+
+df_violencia_2006<- read_excel("C:/Users/julia/Desktop/TFG/2023\\violencia_2006.xlsx")
+df_igualtat_2006<- read_excel("C:/Users/julia/Desktop/TFG/2023\\igualtat_2006.xlsx")
+df_familia_2006<- read_excel("C:/Users/julia/Desktop/TFG/2023\\familia_llar_2006.xlsx")
+df_salut_2006<- read_excel("C:/Users/julia/Desktop/TFG/2023\\salut_sexual_2006.xlsx")
+
+cat_2006 <- bind_rows(df_salut_2006, df_igualtat_2006, df_treball_2006, df_treball_sex_2006, df_familia_2006,  df_violencia_2006)
+
+```
+2005
+
+```{r}
+
+
+df_treball_2005<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_2005.xlsx")
+df_treball_sex_2005<- read_excel("C:/Users/julia/Desktop/TFG/2023\\treball_sexual_2005.xlsx")
+df_representacio_2005<- read_excel("C:/Users/julia/Desktop/TFG/2023\\representacio_2005.xlsx")
+
+df_violencia_2005<- read_excel("C:/Users/julia/Desktop/TFG/2023\\violencia_2005.xlsx")
+df_igualtat_2005<- read_excel("C:/Users/julia/Desktop/TFG/2023\\igualtat_2005.xlsx")
+df_familia_2005<- read_excel("C:/Users/julia/Desktop/TFG/2023\\familia_llar_2005.xlsx")
+df_salut_2005<- read_excel("C:/Users/julia/Desktop/TFG/2023\\salut_sexual_2005.xlsx")
+
+cat_2005 <- bind_rows(df_salut_2005, df_igualtat_2005, df_treball_2005, df_treball_sex_2005, df_familia_2005,  df_violencia_2005,  df_representacio_2005)
+
+```
+
+legislatures
+
+```{r}
+
+df_lesgi_2023_2021<- read_excel("C:/Users/julia/Desktop/TFG/politics_taules\\2021-2023.xlsx")
+df_lesgi_2021_2017<- read_excel("C:/Users/julia/Desktop/TFG/politics_taules\\2017_2021.xlsx")
+df_lesgi_2017_2015<- read_excel("C:/Users/julia/Desktop/TFG/politics_taules\\2015-2017.xlsx")
+df_lesgi_2015_2012<- read_excel("C:/Users/julia/Desktop/TFG/politics_taules\\2012_2015.xlsx")
+df_lesgi_2012_2010<- read_excel("C:/Users/julia/Desktop/TFG/politics_taules\\2010_2012.xlsx")
+df_lesgi_2010_2006<- read_excel("C:/Users/julia/Desktop/TFG/politics_taules\\2006_2010.xlsx")
+df_lesgi_2006_2003<- read_excel("C:/Users/julia/Desktop/TFG/politics_taules\\2003_2006.xlsx")
+rep<- read_excel("C:/Users/julia/Desktop/TFG/politics_taules\\PERCENT.xlsx")
+
+```
+
+adejuntar tematiques
+```{r}
+
+
+merged_df_2023 <- merge(cat_2023, df_lesgi_2023_2021, by.x ="Segmento", by.y= "NOM", all = FALSE)
+merged_df_2022 <- merge(cat_2022, df_lesgi_2023_2021, by.x ="Segmento", by.y= "NOM", all = FALSE)
+merged_df_2021 <- merge(cat_2021, df_lesgi_2023_2021, by.x ="Segmento", by.y= "NOM", all = FALSE)
+merged_df_2020 <- merge(cat_2020, df_lesgi_2021_2017, by.x ="Segmento", by.y= "NOM", all = FALSE)
+merged_df_2019 <- merge(cat_2019, df_lesgi_2021_2017, by.x ="Segmento", by.y= "NOM", all = FALSE)
+merged_df_2018 <- merge(cat_2018, df_lesgi_2021_2017, by.x ="Segmento", by.y= "NOM", all = FALSE)
+
+merged_df_2017 <- merge(cat_2017, df_lesgi_2021_2017, by.x ="Segmento", by.y= "NOM", all = FALSE)
+
+merged_df_2016 <- merge(cat_2016, df_lesgi_2017_2015, by.x ="Segmento", by.y= "NOM", all = FALSE)
+merged_df_2015 <- merge(cat_2015, df_lesgi_2017_2015, by.x ="Segmento", by.y= "NOM", all = FALSE)
+merged_df_2014 <- merge(cat_2014, df_lesgi_2015_2012, by.x ="Segmento", by.y= "NOM", all = FALSE)
+merged_df_2013 <- merge(cat_2013, df_lesgi_2015_2012, by.x ="Segmento", by.y= "NOM", all = FALSE)
+merged_df_2012 <- merge(cat_2012, df_lesgi_2015_2012, by.x ="Segmento", by.y= "NOM", all = FALSE)
+merged_df_2011 <- merge(cat_2011, df_lesgi_2012_2010, by.x ="Segmento", by.y= "NOM", all = FALSE)
+merged_df_2010 <- merge(cat_2010, df_lesgi_2010_2006, by.x ="Segmento", by.y= "NOM", all = FALSE)
+merged_df_2009 <- merge(cat_2009, df_lesgi_2010_2006, by.x ="Segmento", by.y= "NOM", all = FALSE)
+merged_df_2008 <- merge(cat_2008, df_lesgi_2010_2006, by.x ="Segmento", by.y= "NOM", all = FALSE)
+merged_df_2007 <- merge(cat_2007, df_lesgi_2010_2006, by.x ="Segmento", by.y= "NOM", all = FALSE)
+merged_df_2006 <- merge(cat_2006, df_lesgi_2010_2006, by.x ="Segmento", by.y= "NOM", all = FALSE)
+merged_df_2005 <- merge(cat_2005, df_lesgi_2006_2003, by.x ="Segmento", by.y= "NOM", all = FALSE)
+
+```
+
+```{r}
+
+merged_df_tots <- rbind(merged_df_2023, merged_df_2022, merged_df_2021, merged_df_2020, merged_df_2019, merged_df_2018, merged_df_2017, merged_df_2016, merged_df_2015, merged_df_2014, merged_df_2013, merged_df_2012, merged_df_2011, merged_df_2010, merged_df_2008, merged_df_2009, merged_df_2007, merged_df_2006, merged_df_2005)
+
+
+merged_df_tots_repre <- merge(merged_df_tots, rep, by.x ="Grupo de documentos", by.y= "ANY", all = TRUE)
+
+merged_df_tots_repre$PARTIT <- gsub("CiU", "CIU", merged_df_tots_repre$PARTIT)
+merged_df_tots$PARTIT <- gsub("CiU", "CIU", merged_df_tots$PARTIT)
+
+
+library(dplyr)
+merged_df_tots_repre<- merged_df_tots_repre[, !(names(merged_df_tots_repre) %in% c("Color", "Nombre del documento"))]
+merged_df_tots <- merged_df_tots %>% filter(Código != "treball_sexual")
+merged_df_tots <- merged_df_tots %>% filter(PARTIT != "No adscrit[7]")
+merged_df_tots <- merged_df_tots %>% filter(PARTIT != "Grup Mixt")
+
+```
+
+
+
+```{r}
+gender_counts <- aggregate(merged_df_tots_repre$Segmento, by = list(Year = merged_df_tots_repre$`Grupo de documentos`, Gender = merged_df_tots_repre$GENERE), FUN = length)
+names(gender_counts)[names(gender_counts) == "x"] <- "Count"
+
+ggplot(gender_counts, aes(x = Year, y = Count, color = Gender, group = Gender)) +
+  geom_line(size = 1.2) +
+  geom_point(size = 3) +
+  scale_x_continuous(breaks = seq(min(Party_counts$Year), max(Party_counts$Year), 1)) +
+  scale_color_manual(name= "Gènere", values = c("H" = "#F8766D", "D" = "#00C19A"),
+                     labels = c("H"="Homes", "D"="Dones")) +
+  labs( x = "", y = "") +
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 75, vjust = 0.5, hjust=1))
+
+
+
+
+```
+
+```{r}
+Party_counts <- aggregate(merged_df_tots_repre$Segmento, by = list(Year = merged_df_tots_repre$`Grupo de documentos`, party = merged_df_tots_repre$PARTIT), FUN = length)
+names(Party_counts)[names(Party_counts) == "x"] <- "Count"
+
+Party_counts<- Party_counts %>% filter(!(party %in% c("Grup Mixt", "No adscrit[7]")))
+
+ggplot(Party_counts, aes(x = Year, y = Count, color = party, group = party)) +
+  geom_line(size = 0.7) +
+  geom_point(size = 2) +
+  scale_x_continuous(breaks = seq(min(Party_counts$Year), max(Party_counts$Year), 1)) +
+  scale_color_manual(
+    name = "Partits", 
+    values = c("CIU" = "skyblue", "Ciutadans" = "orange", "CUP"="yellow", "ERC"="gold", "ICV"= "pink", "Podem"="purple", "PP"="blue", "PSC"= "red", "Vox"= "green"), 
+    labels = c("CIU" = "CDC/CIU/JUNTS", "Ciutadans" = "Ciutadans", "CUP"="CUP", "ERC"="ERC", "ICV"= "ICV", "Podem"="Comuns", "PP"="PP", "PSC"= "PSC", "Vox"= "Vox"))+
+  labs(x= "", y = "Count") +
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 75, vjust = 0.5, hjust=1))
+
+
+
+
+```
+```{r}
+
+long_datass <- pivot_longer(merged_df_tots_repre, cols = -c(Segmento,  `Grupo de documentos`,  PARTIT, GENERE, PERCENT), names_to = "Variable", values_to = "Value")
+
+# Print the long format table
+print(long_datass)
+
+```
+```{r}
+
+# Create a contingency table
+contingency_table <- table(merged_df_tots_repre$PARTIT, merged_df_tots_repre$Código)
+
+# View the contingency table
+print(contingency_table)
+
+# Perform the Chi-Square test
+chi_square_result <- chisq.test(contingency_table)
+
+# View the result
+print(chi_square_result)
+
+
+```
+```{r}
+df_women <- merged_df_tots_repre[merged_df_tots_repre$GENERE == "D", ]
+
+df_count_w <- df_women %>%
+  group_by(`Grupo de documentos`, Código) %>%
+  summarise(Frequency = n()) %>%
+  ungroup()
+
+
+ggplot(data = df_count_w, aes(x = `Grupo de documentos`, y = Frequency ,fill = Código)) +
+  geom_area() +
+  scale_x_continuous(breaks = seq(min(Party_counts$Year), max(Party_counts$Year), 1)) +
+  scale_fill_manual(
+    name = "Temàtiques", 
+    values = c("Familia_llar" = "#F8766D", "Fem_igualtat" = "#CD9600", "representacio"="#7CAE00", "Salut_sexual"="#00C19A", "treball"="#00A9FF", "treball_sex"="#C77CFF", "Violencia"="#FF61CC"), 
+    labels = c("Familia_llar" = "Familia/infants/llar", "Fem_igualtat" = "Feminsime/igualtat", "representacio"="RepresentaciÓ", "Salut_sexual"="Salut sexual", "treball"="Treball", "treball_sex"="Treball sexual", "Violencia"="Violència"))+
+  labs(
+       x = "",
+       y = ""
+       ) +
+  
+  theme(axis.text.x = element_text(angle = 75, vjust = 0.5, hjust=1))
+  
+```
+
+```{r}
+df_men <- merged_df_tots_repre[merged_df_tots_repre$GENERE == "H", ]
+
+df_count_M <- df_men %>%
+  group_by(`Grupo de documentos`, Código) %>%
+  summarise(Frequency = n()) %>%
+  ungroup()
+
+
+ggplot(data = df_count_M, aes(x = `Grupo de documentos`, y = Frequency ,fill = Código)) +
+  geom_area() +
+  scale_x_continuous(breaks = seq(min(Party_counts$Year), max(Party_counts$Year), 1)) +
+  scale_fill_manual(
+    name = "Temàtiques", 
+    values = c("Familia_llar" = "#F8766D", "Fem_igualtat" = "#CD9600", "representacio"="#7CAE00", "Salut_sexual"="#00C19A", "treball"="#00A9FF", "treball_sex"="#C77CFF", "Violencia"="#FF61CC"), 
+    labels = c("Familia_llar" = "Familia/ infants / llar", "Fem_igualtat" = "Feminisme/ igualtat", "representacio"="Representació", "Salut_sexual"="Salut sexual", "treball"="Treball", "treball_sex"="Treball sexual", "Violencia"="Violència"))+
+  ylim(0, 500)+
+  labs(
+       x = "",
+       y = ""
+       ) +
+  
+  theme(axis.text.x = element_text(angle = 75, vjust = 0.5, hjust=1))
+  
+```
+```{r}
+install.packages("nnet")
+library(nnet)
+
+merged_df_tots_repre$Código<- as.factor(merged_df_tots_repre$Código)
+merged_df_tots_repre$PARTIT <- as.factor(merged_df_tots_repre$PARTIT)
+merged_df_tots_repre$GENERE <- as.factor(merged_df_tots_repre$GENERE)
+
+merged_df_tots_repre <- subset(merged_df_tots_repre, `Grupo de documentos` != 2004)
+
+merged_df_tots_repre <- merged_df_tots_repre %>% filter(Código != "treball_sexual")
+
+  
+```
+```{r}
+library(RColorBrewer)
+table_data <- table(  merged_df_tots$PARTIT, merged_df_tots$Código)
+COUL= colorRampPalette(cm.colors(256))
+# Crea el heatmap
+heatmap(table_data, Rowv = NA, Colv = NA, col = heat.colors(256), scale = "column", margins=c(5,10))
+
+
+```
+```{r}
+freq_table <- table( merged_df_tots$PARTIT, merged_df_tots$Código)
+
+# Convert the table to a data frame
+df_freq <- as.data.frame(freq_table)
+colnames(df_freq) <- c("Party", "Topic", "Frequency")
+
+df_freq <- df_freq %>%
+  mutate(
+    Party = recode(Party,
+                   "CIU" = "CDC/CIU/JUNTS", 
+                   "Podem" = "En comú podem"),
+    
+                   
+    Topic = recode(Topic,
+                   "treball_sex" = "Treball sexual",
+                   "Salut_sexual" = "Salut sexual",
+                   "Fem_igualtat" = "Feminisme i igualtat",
+                   "representacio" = "Representació",
+                   "Familia_llar" = "Familia, llar i infants")
+  )
+
+library(ggplot2)
+ggplot(df_freq, aes(x = Party, y = Topic, fill = Frequency)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient(low = "white", high = "blue", name = "Frequency") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  labs(x = "Partit",
+      y = "Temàtica")
+
+```
+
+
+```
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
